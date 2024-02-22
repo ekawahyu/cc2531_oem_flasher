@@ -36,6 +36,47 @@ python oem_flasher.py stub.bin bootloader/bootloader.bin
 make flash
 ```
 
+## Workaround to build after submodule fixes on Apple M1 Mac
+Add Homebrew binutils path:
+```sh
+export PATH=/opt/homebrew/opt/binutils/bin/:$PATH
+```
+Submodules are pointing to origin repo that requires original author credential. Below is the temporary workaround until it gets fixed:
+```sh
+# Check out repo
+git clone 'https://github.com/rosvall/cc2531_oem_flasher.git'
+
+# Replace git submodule url in .gitmodules
+	url = git@github.com:rosvall/cc2531_bsp_asm.git
+# to
+	url = https://github.com/rosvall/cc2531_bsp_asm.git
+
+# Initialize and update submodule
+git submodule init
+git submodule update
+
+# Change directory to bootloader
+cd bootloader
+
+# Replace git submodule url in .gitmodules
+	url = git@github.com:rosvall/cc2531_bsp_asm.git
+# to
+	url = https://github.com/rosvall/cc2531_bsp_asm.git
+
+# Initialize and update submodule
+git submodule init
+git submodule update
+
+# Build flasher stub and bootloader
+cd ../
+make
+
+# Flash bootloader to CC2531 dongle (that runs stock sniffer firmware)
+python oem_flasher.py stub.bin bootloader/bootloader.bin
+#or simply
+make flash
+```
+
 ## How to use
 ```sh
 # Flash bootloader to CC2531 dongle (that runs stock sniffer firmware)
